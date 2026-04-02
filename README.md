@@ -159,6 +159,10 @@ This works well with Apple Shortcuts, but any client that can make local HTTP re
 
 If `.local` resolution is slow or unreliable on a client, the board IP can be used instead.
 
+## TODO
+
+- Keep countdowns moving during temporary API or network failures by caching the last successful per-display departure state and locally decrementing displayed minutes until fresh Trafiklab data arrives.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE).
