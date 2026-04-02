@@ -14,6 +14,8 @@ Displays stay blank when no matching departure is within 59 minutes.
 
 - Trafiklab realtime departures
 - dynamic display brightness based on countdown
+  - the closer the bus is, the brighter the display
+  - the farther away the bus is, the dimmer the display
 - local HTTP remote control:
   - `/on`
   - `/off`
@@ -85,7 +87,7 @@ If you want fewer or more displays:
 1. Add or remove the `CLK` / `DIO` pin definitions.
 2. Add or remove the `TM1637Display displayX(...)` objects.
 3. Add or remove entries in the `displays[]` array.
-4. Make sure `kDisplayTargets` has the same number of entries as `displays[]`.
+4. Make sure `displayTargets` has the same number of entries as `displays[]`.
 
 ### Change the wiring
 
@@ -100,13 +102,13 @@ To move a display to different pins, just change those values and upload again.
 
 ### Change which bus each display shows
 
-Each display target is configured in `kDisplayTargets`:
+Each display target is configured in `displayTargets`:
 
 ```cpp
-const TrafiklabApi::DisplayTarget kDisplayTargets[DISPLAY_COUNT] = {
-  {TrafiklabApi::kTollareTorgAreaId, "414", "Slussen", "Tollare torg 414 -> Slussen"},
-  {TrafiklabApi::kHedenstromsVagAreaId, "442", "Slussen", "Hedenstroms vag 442 -> Slussen"},
-  {TrafiklabApi::kTollareTorgAreaId, "442X", "Glasbruksgatan", "Tollare torg 442X -> Glasbruksgatan"}
+const TrafiklabApi::DisplayTarget displayTargets[DISPLAY_COUNT] = {
+  {TrafiklabApi::tollareTorgAreaId, "414", "Slussen", "Tollare torg 414 -> Slussen"},
+  {TrafiklabApi::hedenstromsVagAreaId, "442", "Slussen", "Hedenstroms vag 442 -> Slussen"},
+  {TrafiklabApi::tollareTorgAreaId, "442X", "Glasbruksgatan", "Tollare torg 442X -> Glasbruksgatan"}
 };
 ```
 
@@ -125,14 +127,14 @@ Each entry is:
 
 The project currently includes two named area ids in `TrafiklabApi.h`:
 
-- `TrafiklabApi::kTollareTorgAreaId`
-- `TrafiklabApi::kHedenstromsVagAreaId`
+- `TrafiklabApi::tollareTorgAreaId`
+- `TrafiklabApi::hedenstromsVagAreaId`
 
 You can either:
 
 - reuse those constants
 - add new constants in `TrafiklabApi.h` and `TrafiklabApi.cpp`
-- or put the raw area id string directly into `kDisplayTargets`
+- or put the raw area id string directly into `displayTargets`
 
 Example:
 

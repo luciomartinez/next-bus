@@ -5,10 +5,12 @@
 #include "secrets.h"
 
 const char* DEVICE_HOSTNAME = "next-bus";
+const unsigned long SERIAL_BAUD_RATE = 115200;
 const unsigned long WIFI_TIMEOUT_MS = 20000;
 const unsigned long WIFI_RETRY_DELAY_MS = 500;
 const unsigned long WIFI_RESET_DELAY_MS = 250;
 const unsigned long UPDATE_INTERVAL_MS = 30000;
+const unsigned long IDLE_LOOP_DELAY_MS = 25;
 const uint8_t DISPLAY_BRIGHTNESS = 7;
 const bool DYNAMIC_DISPLAY_BRIGHTNESS = true;
 const int MAX_DISPLAY_MINUTES = 59;
@@ -32,10 +34,10 @@ TM1637Display* displays[] = {&display1, &display2, &display3};
 
 constexpr size_t DISPLAY_COUNT = sizeof(displays) / sizeof(displays[0]);
 
-const TrafiklabApi::DisplayTarget kDisplayTargets[DISPLAY_COUNT] = {
-  {TrafiklabApi::kTollareTorgAreaId, "414", "Slussen", "Tollare torg 414 -> Slussen"},
-  {TrafiklabApi::kHedenstromsVagAreaId, "442", "Slussen", "Hedenstroms vag 442 -> Slussen"},
-  {TrafiklabApi::kTollareTorgAreaId, "442X", "Glasbruksgatan", "Tollare torg 442X -> Glasbruksgatan"}
+const TrafiklabApi::DisplayTarget displayTargets[DISPLAY_COUNT] = {
+  {TrafiklabApi::tollareTorgAreaId, "414", "Slussen", "Tollare torg 414 -> Slussen"},
+  {TrafiklabApi::hedenstromsVagAreaId, "442", "Slussen", "Hedenstroms vag 442 -> Slussen"},
+  {TrafiklabApi::tollareTorgAreaId, "442X", "Glasbruksgatan", "Tollare torg 442X -> Glasbruksgatan"}
 };
 
 bool missingApiKeyReported = false;
@@ -43,7 +45,7 @@ bool lastRenderedEnabledState = true;
 unsigned long lastUpdateAttemptMs = 0;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD_RATE);
   DisplayBoard::initialize(displays, DISPLAY_COUNT, DISPLAY_BRIGHTNESS);
   TrafiklabApi::configureTimezone();
   lastRenderedEnabledState = true;
@@ -74,7 +76,7 @@ void loop() {
       DisplayBoard::clearAll(displays, DISPLAY_COUNT);
       lastRenderedEnabledState = false;
     }
-    delay(25);
+    delay(IDLE_LOOP_DELAY_MS);
     return;
   }
 
@@ -89,20 +91,20 @@ void loop() {
       missingApiKeyReported = true;
     }
     DisplayBoard::clearAll(displays, DISPLAY_COUNT);
-    delay(250);
+    delay(IDLE_LOOP_DELAY_MS);
     return;
   }
 
   const unsigned long now = millis();
   if (lastUpdateAttemptMs != 0 && (now - lastUpdateAttemptMs) < UPDATE_INTERVAL_MS) {
-    delay(25);
+    delay(IDLE_LOOP_DELAY_MS);
     return;
   }
 
   lastUpdateAttemptMs = now;
   int nextBusMinutes[DISPLAY_COUNT] = {-1, -1, -1};
   TrafiklabApi::fetchDisplayMinutes(
-    kDisplayTargets,
+    displayTargets,
     DISPLAY_COUNT,
     nextBusMinutes,
     MAX_DISPLAY_MINUTES
@@ -116,5 +118,5 @@ void loop() {
     DISPLAY_BRIGHTNESS,
     DYNAMIC_DISPLAY_BRIGHTNESS
   );
-  delay(25);
+  delay(IDLE_LOOP_DELAY_MS);
 }

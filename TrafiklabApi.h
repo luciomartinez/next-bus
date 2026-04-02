@@ -4,8 +4,8 @@
 
 namespace TrafiklabApi {
 
-extern const char* const kTollareTorgAreaId;
-extern const char* const kHedenstromsVagAreaId;
+extern const char* const tollareTorgAreaId;
+extern const char* const hedenstromsVagAreaId;
 
 struct DisplayTarget {
   const char* areaId;

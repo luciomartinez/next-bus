@@ -9,11 +9,12 @@ namespace RemoteControl {
 
 namespace {
 
-const char* const kPreferencesNamespace = "next-bus";
-const char* const kEnabledKey = "enabled";
+const char* const preferencesNamespace = "next-bus";
+const char* const enabledKey = "enabled";
+const uint16_t httpPort = 80;
 
 Preferences preferences;
-WebServer server(80);
+WebServer server(httpPort);
 bool enabled = true;
 bool enabledLoaded = false;
 bool changed = false;
@@ -21,7 +22,7 @@ bool serverStarted = false;
 String mdnsHostname;
 
 void persistEnabledState() {
-  preferences.putBool(kEnabledKey, enabled);
+  preferences.putBool(enabledKey, enabled);
 }
 
 void setEnabledState(bool newValue) {
@@ -72,7 +73,7 @@ void ensureServerStarted() {
 
   if (mdnsHostname.length() > 0) {
     if (MDNS.begin(mdnsHostname.c_str())) {
-      MDNS.addService("http", "tcp", 80);
+      MDNS.addService("http", "tcp", httpPort);
       Serial.printf("mDNS started at http://%s.local\n", mdnsHostname.c_str());
     } else {
       Serial.println("Failed to start mDNS.");
@@ -107,8 +108,8 @@ void ensureServerStarted() {
 
 void begin(const char* hostname, bool defaultEnabled) {
   if (!enabledLoaded) {
-    preferences.begin(kPreferencesNamespace, false);
-    enabled = preferences.getBool(kEnabledKey, defaultEnabled);
+    preferences.begin(preferencesNamespace, false);
+    enabled = preferences.getBool(enabledKey, defaultEnabled);
     enabledLoaded = true;
     changed = false;
   }

@@ -11,13 +11,14 @@
 
 namespace TrafiklabApi {
 
-const char* const kTollareTorgAreaId = "740076054";
-const char* const kHedenstromsVagAreaId = "740076458";
+const char* const tollareTorgAreaId = "740076054";
+const char* const hedenstromsVagAreaId = "740076458";
 
 namespace {
 
-const char* const kApiBaseUrl = "https://realtime-api.trafiklab.se/v1";
-const char* const kTimezone = "CET-1CEST,M3.5.0/2,M10.5.0/3";
+const char* const apiBaseUrl = "https://realtime-api.trafiklab.se/v1";
+const char* const timezone = "CET-1CEST,M3.5.0/2,M10.5.0/3";
+const size_t departuresJsonCapacity = 32768;
 
 bool parseIsoTimestamp(const char* value, time_t& parsedTime) {
   int year = 0;
@@ -150,6 +151,7 @@ bool findMinutesForTarget(JsonArray departures,
       continue;
     }
 
+    // Only the next matching departure matters for each display target.
     if (minutes > maxDisplayMinutes) {
       return false;
     }
@@ -165,8 +167,8 @@ bool fetchAreaDisplayMinutes(const char* areaId,
                              size_t targetCount,
                              int* minutesBuffer,
                              int maxDisplayMinutes) {
-  DynamicJsonDocument doc(32768);
-  const String url = String(kApiBaseUrl) +
+  DynamicJsonDocument doc(departuresJsonCapacity);
+  const String url = String(apiBaseUrl) +
                      "/departures/" + String(areaId) +
                      "?key=" + String(TRAFIKLAB_API_KEY);
 
@@ -218,7 +220,7 @@ bool fetchAreaDisplayMinutes(const char* areaId,
 }  // namespace
 
 void configureTimezone() {
-  setenv("TZ", kTimezone, 1);
+  setenv("TZ", timezone, 1);
   tzset();
 }
 

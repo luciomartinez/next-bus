@@ -4,38 +4,43 @@ namespace DisplayBoard {
 
 namespace {
 
+const uint8_t minVisibleBrightness = 1;
+const uint8_t maxBrightness = 7;
+
+struct BrightnessBand {
+  int maxMinutes;
+  uint8_t brightness;
+};
+
+const BrightnessBand brightnessBands[] = {
+  {10, maxBrightness},
+  {14, 6},
+  {19, 5},
+  {24, 4},
+  {29, 3},
+  {39, 2},
+  {59, minVisibleBrightness},
+};
+
+const uint8_t blankSegments[] = {0x00, 0x00, 0x00, 0x00};
+
 uint8_t brightnessForValue(int value, uint8_t defaultBrightness, bool dynamicBrightnessEnabled) {
   if (!dynamicBrightnessEnabled || value < 0) {
     return defaultBrightness;
   }
 
-  if (value <= 10) {
-    return 7;
-  }
-  if (value <= 14) {
-    return 6;
-  }
-  if (value <= 19) {
-    return 5;
-  }
-  if (value <= 24) {
-    return 4;
-  }
-  if (value <= 29) {
-    return 3;
-  }
-  if (value <= 39) {
-    return 2;
-  }
-  if (value <= 59) {
-    return 1;
+  // TM1637 brightness is in the range 0..7, where 7 is brightest.
+  // Nearer departures render brighter so the most urgent bus stands out first.
+  for (const BrightnessBand& band : brightnessBands) {
+    if (value <= band.maxMinutes) {
+      return band.brightness;
+    }
   }
 
   return defaultBrightness;
 }
 
 void clear(TM1637Display& display) {
-  uint8_t blankSegments[] = {0x00, 0x00, 0x00, 0x00};
   display.setSegments(blankSegments);
 }
 
