@@ -13,12 +13,12 @@ struct BrightnessBand {
 };
 
 const BrightnessBand brightnessBands[] = {
-  {10, maxBrightness},
-  {14, 6},
-  {19, 5},
-  {24, 4},
+  {05, maxBrightness},
+  {9, 6},
+  {14, 5},
+  {19, 4},
   {29, 3},
-  {39, 2},
+  {45, 2},
   {59, minVisibleBrightness},
 };
 
